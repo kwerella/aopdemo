@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+">
+
+    <bean id="booking" class="com.niit.business.BookingImpl"/>
+        
+    <bean id="secondaryBooking" class="com.niit.business.SecondaryBooking"/>
+        
+    <bean id="bookingAdvice" class="com.niit.business.BookingAdvice">
+        <property name="secondaryBooking" ref="secondaryBooking"/>
+    </bean>
+    
+    <!-- Defining pointcut to link with the book method of any object  -->
+    <bean id="bookingPointCut" class="org.springframework.aop.support.JdkRegexpMethodPointcut">
+        <property name="pattern" value=".*book"/>
+    </bean> 
+    
+   <!-- Define a pointcut advisor to link the advice with a pointcut -->
+    <bean id="bookingAdvisor" class="org.springframework.aop.support.DefaultPointcutAdvisor">
+        <property name="advice" ref="bookingAdvice"/>
+        <property name="pointcut" ref="bookingPointCut"/>
+    </bean>
+    
+    
+    <!-- Creating the proxy object -->
+    <bean id="bookingProxy" class="org.springframework.aop.framework.ProxyFactoryBean">
+       <property name="target" ref="booking"/> 
+       <property name="interceptorNames" value="bookingAdvisor" /> 
+       <property name="proxyInterfaces" value="com.niit.business.Booking"/> 
+    </bean>              
+    
+</beans>
